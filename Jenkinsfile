@@ -20,4 +20,4 @@ pipeline {
  }
  }
 }
-Step 4: : Run the Pipeline
+
