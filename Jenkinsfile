@@ -1,23 +1,38 @@
 pipeline {
- agent any // Runs on any available agent
- stages {
- stage('Build') {
- steps {
- echo "Building the project..."
-// sh 'ls -la' // Linux/macOS command
- bat 'dir'
- }
- }
- stage('Test') {
- steps {
- echo "Running tests..."
- }
- }
- stage('Deploy') {
- steps {
- echo "Deploying..."
- }
- }
- }
-}
+    agent any
 
+    environment {
+        DOCKER_IMAGE = 'tuyishimirer1/my-web-app'    // Your Docker Hub repo
+        DOCKER_CREDENTIALS_ID = 'Dusenge45@'  // Jenkins credentials ID
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    echo "Building Docker image..."
+                    dockerImage = docker.build("${DOCKER_IMAGE}:latest")
+                }
+            }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                script {
+                    echo "Pushing Docker image to Docker Hub..."
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKER_CREDENTIALS_ID) {
+                        dockerImage.push('latest')
+                    }
+                }
+            }
+        }
+
+    }
+}
