@@ -1,23 +1,30 @@
 pipeline {
- agent any // Runs on any available agent
- stages {
- stage('Build') {
- steps {
- echo "Building the project..."
-// sh 'ls -la' // Linux/macOS command
- bat 'dir'
- }
- }
- stage('Test') {
- steps {
- echo "Running tests..."
- }
- }
- stage('Deploy') {
- steps {
- echo "Deploying..."
- }
- }
- }
-}
+    agent any
 
+    stages {
+        stage('Install Dependencies') {
+            steps {
+                echo 'Installing Node.js dependencies...'
+                // Runs npm install in workspace
+                bat 'npm install'
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                echo 'Running tests...'
+                // Runs npm test
+                bat 'npm test'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Build succeeded!'
+        }
+        failure {
+            echo 'Build failed! Check console output.'
+        }
+    }
+}
